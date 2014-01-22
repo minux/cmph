@@ -1,3 +1,4 @@
+# after autogen.sh
 /INSTALL
 /Makefile.in
 /aclocal.m4
@@ -17,3 +18,46 @@
 /src/Makefile.in
 /test-driver
 /tests/Makefile.in
+# after configure
+/Makefile
+/cmph.pc
+/config.h
+/config.log
+/config.status
+/cxxmph.pc
+/cxxmph/.deps/
+/cxxmph/Makefile
+/examples/.deps/
+/examples/Makefile
+/libtool
+/man/Makefile
+/src/.deps/
+/src/Makefile
+/stamp-h1
+/tests/.deps/
+/tests/Makefile
+# after make
+/src/bm_numbers
+/src/cmph
+/src/libcmph.la
+/src/*.o
+/src/*.lo
+/src/.libs
+/examples/*.o
+/examples/.libs
+/examples/file_adapter_ex2
+/examples/small_set_ex4
+/examples/struct_vector_adapter_ex3
+/examples/vector_adapter_ex1
+/tests/packed_mphf_tests
+/tests/mphf_tests
+/tests/.libs/
+/tests/*.o
+# after make check
+/tests/cmph_benchmark_test
+/tests/compressed_rank_tests
+/tests/compressed_seq_tests
+/tests/graph_tests
+/tests/select_tests
+/tests/*.log
+/tests/*.trs
