@@ -18,13 +18,13 @@ cmph_uint32 fnv_hash(fnv_state_t *state, const char *k, cmph_uint32 keylen)
 {
 	const unsigned char *bp = (const unsigned char *)k;
 	const unsigned char *be = bp + keylen;
-	static unsigned int hval = 0;
+	/*static*/ unsigned int hval = 0; // 2166136261;
 
 	while (bp < be)
 	{
 
-		//hval *= 0x01000193; good for non-gcc compiler
-		hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24); //good for gcc
+		hval *= 0x01000193; // good for non-gcc compiler
+		//hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24); //good for gcc
 
 		hval ^= *bp++;
 	}
