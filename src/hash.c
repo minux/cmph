@@ -7,7 +7,7 @@
 //#define DEBUG
 #include "debug.h"
 
-const char *cmph_hash_names[] = { "jenkins", NULL };
+const char *cmph_hash_names[] = { "jenkins", "fnv", NULL };
 
 hash_state_t *hash_state_new(CMPH_HASH hashfunc, cmph_uint32 hashsize)
 {
@@ -18,6 +18,11 @@ hash_state_t *hash_state_new(CMPH_HASH hashfunc, cmph_uint32 hashsize)
 	  		DEBUGP("Jenkins function - %u\n", hashsize);
 			state = (hash_state_t *)jenkins_state_new(hashsize);
 	  		DEBUGP("Jenkins function created\n");
+			break;
+		case CMPH_HASH_FNV:
+	  		DEBUGP("FNV function - %u (ignored)\n", hashsize);
+			state = (hash_state_t *)fnv_state_new();
+	  		DEBUGP("FNV function created\n");
 			break;
 		default:
 			assert(0);
@@ -31,6 +36,9 @@ cmph_uint32 hash(hash_state_t *state, const char *key, cmph_uint32 keylen)
 	{
 		case CMPH_HASH_JENKINS:
 			return jenkins_hash((jenkins_state_t *)state, key, keylen);
+		case CMPH_HASH_FNV:
+			return fnv_hash((fnv_state_t *)state, key, keylen);
+			break;
 		default:
 			assert(0);
 	}
@@ -44,6 +52,9 @@ void hash_vector(hash_state_t *state, const char *key, cmph_uint32 keylen, cmph_
 	{
 		case CMPH_HASH_JENKINS:
 			jenkins_hash_vector_((jenkins_state_t *)state, key, keylen, hashes);
+			break;
+		case CMPH_HASH_FNV:
+			fnv_hash_vector_((fnv_state_t *)state, key, keylen, hashes);
 			break;
 		default:
 			assert(0);
@@ -60,8 +71,14 @@ void hash_state_dump(hash_state_t *state, char **buf, cmph_uint32 *buflen)
 		case CMPH_HASH_JENKINS:
 			jenkins_state_dump((jenkins_state_t *)state, &algobuf, buflen);
 			if (*buflen == UINT_MAX) {
-                goto cmph_cleanup;
-            }
+				goto cmph_cleanup;
+			}
+			break;
+		case CMPH_HASH_FNV:
+			fnv_state_dump((fnv_state_t *)state, &algobuf, buflen);
+			if (*buflen == UINT_MAX) {
+				goto cmph_cleanup;
+			}
 			break;
 		default:
 			assert(0);
@@ -84,6 +101,9 @@ hash_state_t * hash_state_copy(hash_state_t *src_state)
 	{
 		case CMPH_HASH_JENKINS:
 			dest_state = (hash_state_t *)jenkins_state_copy((jenkins_state_t *)src_state);
+			break;
+		case CMPH_HASH_FNV:
+			dest_state = (hash_state_t *)fnv_state_copy((fnv_state_t *)src_state);
 			break;
 		default:
 			assert(0);
@@ -111,6 +131,8 @@ hash_state_t *hash_state_load(const char *buf, cmph_uint32 buflen)
 	{
 		case CMPH_HASH_JENKINS:
 			return (hash_state_t *)jenkins_state_load(buf + offset, buflen - offset);
+		case CMPH_HASH_FNV:
+			return (hash_state_t *)fnv_state_load(buf + offset, buflen - offset);
 		default:
 			return NULL;
 	}
@@ -122,6 +144,9 @@ void hash_state_destroy(hash_state_t *state)
 	{
 		case CMPH_HASH_JENKINS:
 			jenkins_state_destroy((jenkins_state_t *)state);
+			break;
+		case CMPH_HASH_FNV:
+			fnv_state_destroy((fnv_state_t *)state);
 			break;
 		default:
 			assert(0);
@@ -145,6 +170,9 @@ void hash_state_pack(hash_state_t *state, void *hash_packed)
 			// pack the jenkins hash function
 			jenkins_state_pack((jenkins_state_t *)state, hash_packed);
 			break;
+		case CMPH_HASH_FNV:
+			fnv_state_pack((fnv_state_t *)state, hash_packed);
+			break;
 		default:
 			assert(0);
 	}
@@ -163,6 +191,9 @@ cmph_uint32 hash_state_packed_size(CMPH_HASH hashfunc)
 	{
 		case CMPH_HASH_JENKINS:
 			size += jenkins_state_packed_size();
+			break;
+		case CMPH_HASH_FNV:
+			size += fnv_state_packed_size();
 			break;
 		default:
 			assert(0);
@@ -183,6 +214,8 @@ cmph_uint32 hash_packed(void *hash_packed, CMPH_HASH hashfunc, const char *k, cm
 	{
 		case CMPH_HASH_JENKINS:
 			return jenkins_hash_packed(hash_packed, k, keylen);
+		case CMPH_HASH_FNV:
+			return fnv_hash_packed(hash_packed, k, keylen);
 		default:
 			assert(0);
 	}
@@ -203,6 +236,8 @@ void hash_vector_packed(void *hash_packed, CMPH_HASH hashfunc, const char *k, cm
 		case CMPH_HASH_JENKINS:
 			jenkins_hash_vector_packed(hash_packed, k, keylen, hashes);
 			break;
+		case CMPH_HASH_FNV:
+			assert(0 && "not implemented");
 		default:
 			assert(0);
 	}

@@ -53,3 +53,25 @@ fnv_state_t *fnv_state_load(const char *buf, cmph_uint32 buflen)
 	state->hashfunc = CMPH_HASH_FNV;
 	return state;
 }
+
+void fnv_hash_vector_(fnv_state_t *state, const char *k, cmph_uint32 keylen, cmph_uint32 * hashes)
+{
+	hashes[0] = fnv_hash(state, k, keylen);
+	hashes[1] = fnv_hash(state, k, keylen);
+	hashes[2] = fnv_hash(state, k, keylen);
+}
+
+void fnv_state_pack(fnv_state_t *state, void *fnv_packed)
+{
+	return;
+}
+
+cmph_uint32 fnv_state_packed_size(void)
+{
+	return 0;
+}
+
+cmph_uint32 fnv_hash_packed(void *fnv_packed, const char *k, cmph_uint32 keylen)
+{
+	return fnv_hash(NULL, k, keylen);
+}
